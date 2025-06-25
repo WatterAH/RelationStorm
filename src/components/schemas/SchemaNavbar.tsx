@@ -3,6 +3,7 @@ import rstrom from "../img/rstrom.jpg";
 import { Badge } from "@/components/ui/badge";
 
 interface Base {
+  id: string;
   title: string;
   description: string;
   color: string;

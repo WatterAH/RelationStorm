@@ -4,6 +4,7 @@ import SchemaNavbar from "./components/schemas/SchemaNavbar";
 import { Zap } from "lucide-react";
 
 interface Base {
+  id: string;
   title: string;
   description: string;
   color: string;
@@ -32,9 +33,7 @@ const Index = () => {
               {bases.map((base, index) => (
                 <SchemaCard
                   key={index}
-                  title={base.title}
-                  description={base.description}
-                  color={base.color}
+                  {...base} //operador de propagacion y estas  como heredando todas las props
                 />
               ))}
             </div>
