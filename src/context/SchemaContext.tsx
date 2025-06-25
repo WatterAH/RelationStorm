@@ -1,4 +1,4 @@
-import type { Attribute, Row, Schema, TableData } from "@/interfaces/Schema";
+import type { Attribute, Row, Table, TableData } from "@/interfaces/Table";
 import React, {
   createContext,
   useContext,
@@ -6,12 +6,13 @@ import React, {
   useState,
   type ReactNode,
 } from "react";
+import { useParams } from "react-router";
 import { toast } from "sonner";
 
-interface SchemaContextProps {
-  schemas: Schema[];
-  addSchema: (relationName: string, callback?: () => void) => void;
-  removeSchema: (id: string) => void;
+interface TableContextProps {
+  tables: Table[];
+  addTable: (tableName: string, callback?: () => void) => void;
+  removeTable: (id: string) => void;
   addAttribute: (schemaId: string, attribute: Attribute) => void;
   removeAttribute: (schemaId: string, attributeName: string) => void;
 
@@ -23,10 +24,10 @@ interface ProviderProps {
   children: ReactNode;
 }
 
-const defaultSchemaContext: SchemaContextProps = {
-  schemas: [],
-  addSchema: () => null,
-  removeSchema: () => null,
+const defaultTableContext: TableContextProps = {
+  tables: [],
+  addTable: () => null,
+  removeTable: () => null,
   addAttribute: () => null,
   removeAttribute: () => null,
   setTableData: () => null,
@@ -34,11 +35,13 @@ const defaultSchemaContext: SchemaContextProps = {
 };
 
 export const SchemaContext =
-  createContext<SchemaContextProps>(defaultSchemaContext);
+  createContext<TableContextProps>(defaultTableContext);
 
 export const SchemaProvider: React.FC<ProviderProps> = ({ children }) => {
-  const [schemas, setSchemas] = useState<Schema[]>(() => {
-    const saved = localStorage.getItem("schemas");
+  const { schemaName } = useParams();
+
+  const [tables, setTables] = useState<Table[]>(() => {
+    const saved = localStorage.getItem("tables");
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -48,8 +51,8 @@ export const SchemaProvider: React.FC<ProviderProps> = ({ children }) => {
   });
 
   useEffect(() => {
-    localStorage.setItem("schemas", JSON.stringify(schemas));
-  }, [schemas]);
+    localStorage.setItem("tables", JSON.stringify(tables));
+  }, [tables]);
 
   useEffect(() => {
     localStorage.setItem("data", JSON.stringify(data));
@@ -62,56 +65,62 @@ export const SchemaProvider: React.FC<ProviderProps> = ({ children }) => {
     }));
   }
 
-  function addSchema(relationName: string, callback?: () => void) {
-    if (!relationName.trim()) {
+  function addTable(tableName: string, callback?: () => void) {
+    if (!tableName.trim() || !schemaName) {
       return toast.error("El nombre del esquema no puede estar vacío!");
     }
 
-    if (schemas.some((s) => s.name === relationName)) {
+    if (tables.some((t) => t.name === tableName)) {
       return toast.error("Ya existe un esquema con ese nombre!");
     }
 
-    const newSchema: Schema = {
+    const newSchema: Table = {
       id: Date.now().toString(),
-      name: relationName,
+      schemaName,
+      name: tableName,
       attributes: [],
     };
 
-    setSchemas([...schemas, newSchema]);
-    setTableData(relationName, []);
+    setTables([...tables, newSchema]);
+    setTableData(tableName, []);
 
     if (callback) callback();
   }
 
-  function removeSchema(id: string) {
-    const schema = schemas.find((s) => s.id === id);
+  function removeTable(id: string) {
+    const schema = tables.find((t) => t.id === id);
     if (schema) {
       const { [schema.name]: _, ...rest } = data;
       setData(rest);
     }
 
-    setSchemas(schemas.filter((s) => s.id !== id));
+    setTables(tables.filter((t) => t.id !== id));
+    setData((prev) => {
+      const newData = { ...prev };
+      delete newData[schemaName || ""];
+      return newData;
+    });
   }
 
   function addAttribute(schemaId: string, attribute: Attribute) {
-    setSchemas((prev) =>
-      prev.map((s) =>
-        s.id == schemaId
-          ? { ...s, attributes: [...s.attributes, attribute] }
-          : s
+    setTables((prev) =>
+      prev.map((t) =>
+        t.id == schemaId
+          ? { ...t, attributes: [...t.attributes, attribute] }
+          : t
       )
     );
   }
 
   function removeAttribute(schemaId: string, attributeName: string) {
-    setSchemas((prev) =>
-      prev.map((s) =>
-        s.id === schemaId
+    setTables((prev) =>
+      prev.map((t) =>
+        t.id === schemaId
           ? {
-              ...s,
-              attributes: s.attributes.filter((a) => a.name !== attributeName),
+              ...t,
+              attributes: t.attributes.filter((a) => a.name !== attributeName),
             }
-          : s
+          : t
       )
     );
   }
@@ -119,9 +128,9 @@ export const SchemaProvider: React.FC<ProviderProps> = ({ children }) => {
   return (
     <SchemaContext.Provider
       value={{
-        schemas,
-        addSchema,
-        removeSchema,
+        tables,
+        addTable,
+        removeTable,
         addAttribute,
         removeAttribute,
         setTableData,

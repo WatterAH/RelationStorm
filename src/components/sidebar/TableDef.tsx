@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import { useSchemas } from "@/context/SchemaContext";
 
 const SchemaDef = () => {
-  const { addSchema } = useSchemas();
+  const { addTable } = useSchemas();
   const [name, setName] = useState("");
 
   const clearName = () => setName("");
@@ -28,7 +28,7 @@ const SchemaDef = () => {
             className="text-sm bg-white"
           />
           <Button
-            onClick={() => addSchema(name, clearName)}
+            onClick={() => addTable(name, clearName)}
             size="sm"
             className="px-3"
           >

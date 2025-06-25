@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import type { Row, Schema } from "@/interfaces/Schema";
+import type { Row, Table } from "@/interfaces/Table";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { useSchemas } from "@/context/SchemaContext";
 import { toast } from "sonner";
 
-const InserRecord: React.FC<Schema> = (schema) => {
+const InserRecord: React.FC<Table> = (table) => {
   const { setTableData } = useSchemas();
   const [formData, setFormData] = useState<Row>({});
 
   const onSubmit = () => {
-    setTableData(schema.name, [formData]);
+    setTableData(table.name, [formData]);
     setFormData({});
     toast.success("Se agregó un nuevo registro");
   };
@@ -32,7 +32,7 @@ const InserRecord: React.FC<Schema> = (schema) => {
   return (
     <div className="space-y-6 max-h-80 overflow-y-auto py-2">
       <div className="grid grid-cols-2 gap-4">
-        {schema.attributes.map((attr) => {
+        {table.attributes.map((attr) => {
           const { type } = attr;
           let inputType = "";
 
