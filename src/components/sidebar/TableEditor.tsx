@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { Attribute, Schema } from "@/interfaces/Schema";
+import type { Attribute, Table } from "@/interfaces/Table";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
@@ -18,12 +18,12 @@ import { Plus, Trash2 } from "lucide-react";
 import { Badge } from "../ui/badge";
 
 interface Props {
-  schema: Schema;
+  table: Table;
 }
 
 const SchemaEditor: React.FC<Props> = (props) => {
-  const { schema } = props;
-  const { schemas, addAttribute, removeAttribute } = useSchemas();
+  const { table } = props;
+  const { tables, addAttribute, removeAttribute } = useSchemas();
   const [newAttribute, setNewAttribute] = useState<Attribute>({
     name: "",
     type: "String",
@@ -122,8 +122,8 @@ const SchemaEditor: React.FC<Props> = (props) => {
                     <SelectValue placeholder="Seleccionar tabla" />
                   </SelectTrigger>
                   <SelectContent>
-                    {schemas
-                      .filter((r: any) => r.id !== schema?.id)
+                    {tables
+                      .filter((r: any) => r.id !== table?.id)
                       .map((rel: any) => (
                         <SelectItem key={rel.id} value={rel.name}>
                           {rel.name}
@@ -149,7 +149,7 @@ const SchemaEditor: React.FC<Props> = (props) => {
                   </SelectTrigger>
                   <SelectContent>
                     {newAttribute.referencedTable &&
-                      schemas
+                      tables
                         .find(
                           (r: any) => r.name === newAttribute.referencedTable
                         )
@@ -165,7 +165,7 @@ const SchemaEditor: React.FC<Props> = (props) => {
           )}
 
           <Button
-            onClick={() => addAttribute(schema.id, newAttribute)}
+            onClick={() => addAttribute(table.id, newAttribute)}
             className="w-full rounded-lg"
           >
             <Plus className="h-4 w-4 mt-1" />
@@ -175,7 +175,7 @@ const SchemaEditor: React.FC<Props> = (props) => {
       </Card>
 
       {/* Existing Attributes */}
-      {schema && schema.attributes.length > 0 && (
+      {table && table.attributes.length > 0 && (
         <Card>
           <CardHeader className="-mb-2">
             <CardTitle className="font-semibold text-xl">
@@ -184,7 +184,7 @@ const SchemaEditor: React.FC<Props> = (props) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {schema.attributes.map((attr: any, index: number) => (
+              {table.attributes.map((attr: any, index: number) => (
                 <div
                   key={index}
                   className="flex items-center justify-between py-3 px-6 bg-gray-100 rounded-xl"
@@ -203,7 +203,7 @@ const SchemaEditor: React.FC<Props> = (props) => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => removeAttribute(schema.id, attr.name)}
+                    onClick={() => removeAttribute(table.id, attr.name)}
                     className="text-red-500 hover:text-red-700"
                   >
                     <Trash2 className="h-4 w-4" />
