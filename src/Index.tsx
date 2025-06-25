@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SchemaCard from "./components/schemas/SchemaCard";
 import SchemaNavbar from "./components/schemas/SchemaNavbar";
 import { Zap } from "lucide-react";
@@ -11,7 +11,14 @@ interface Base {
 }
 
 const Index = () => {
-  const [bases, setBases] = useState<Base[]>([]);
+  const [bases, setBases] = useState<Base[]>(() => {
+    const saved = localStorage.getItem("bases");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("bases", JSON.stringify(bases));
+  }, [bases]);
 
   return (
     <>
