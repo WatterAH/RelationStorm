@@ -1,5 +1,5 @@
-import TableDef from "./TableDef";
 import Tables from "./Tables";
+import TableDef from "./TableDef";
 
 const Sidebar = () => {
   return (

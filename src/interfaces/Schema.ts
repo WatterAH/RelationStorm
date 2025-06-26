@@ -1,8 +1,6 @@
-import type { Table } from "./Table";
-
-export interface Schema {
-  name: string;
-  description?: string;
-  createdAt: Date;
-  tables: Table[];
+export interface Base {
+  id: string;
+  title: string;
+  description: string;
+  color: number;
 }

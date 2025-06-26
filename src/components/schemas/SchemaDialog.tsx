@@ -11,33 +11,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
+import type { Base } from "@/interfaces/Schema";
+import { colors } from "@/constants/Colors";
 
 interface Props {
-  agregarBase: (base: {
-    id: string;
-    title: string;
-    description: string;
-    color: string;
-  }) => void;
+  agregarBase: (base: Base) => void;
 }
 
-const colors = [
-  "from-blue-500 to-blue-600",
-  "from-purple-500 to-purple-600",
-  "from-green-500 to-green-600",
-  "from-orange-500 to-orange-600",
-  "from-red-500 to-red-600",
-  "from-teal-500 to-teal-600",
-  "from-indigo-500 to-indigo-600",
-  "from-pink-500 to-pink-600",
-];
-
 const SchemaDialog = ({ agregarBase }: Props) => {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<Base>({
     id: "",
     title: "",
     description: "",
-    color: colors[0],
+    color: 0,
   });
 
   const [showAlert, setShowAlert] = useState(false);
@@ -48,7 +34,7 @@ const SchemaDialog = ({ agregarBase }: Props) => {
     if (form.title.trim() && form.description.trim()) {
       const newForm = { ...form, id: Date.now().toString() };
       agregarBase(newForm);
-      setForm({ id: "", title: "", description: "", color: colors[0] });
+      setForm({ id: "", title: "", description: "", color: 0 });
       setShowAlert(false);
       setOpen(false); // Cierra el modal si todo está bien
     } else {
@@ -101,9 +87,9 @@ const SchemaDialog = ({ agregarBase }: Props) => {
                 <button
                   key={idx}
                   type="button"
-                  onClick={() => setForm({ ...form, color })}
+                  onClick={() => setForm({ ...form, color: idx })}
                   className={`h-12 rounded-xl bg-gradient-to-r ${color} transition-all hover:scale-105 ${
-                    form.color === color
+                    form.color === idx
                       ? "ring-4 ring-offset-2 ring-gray-300"
                       : ""
                   }`}

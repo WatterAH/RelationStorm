@@ -1,6 +1,6 @@
 export interface Table {
   id: string;
-  schemaName: string;
+  schemaId: string;
   name: string;
   attributes: Attribute[];
 }
