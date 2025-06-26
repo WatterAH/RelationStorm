@@ -20,12 +20,27 @@ const Index = () => {
     localStorage.setItem("bases", JSON.stringify(bases));
   }, [bases]);
 
+  const agregarBase = (nuevaBase: Base) => {
+    setBases((prev) => [...prev, nuevaBase]);
+  };
+
+  const eliminarBase = (id: string) => {
+    setBases((prev) => prev.filter((base) => base.id !== id));
+  };
+
+  const editarBase = (baseEditada: Base) => {
+    setBases((prev) =>
+      prev.map((base) =>
+        base.id === baseEditada.id ? { ...baseEditada } : base
+      )
+    );
+  };
+
   return (
     <>
-      <SchemaNavbar
-        agregarBase={(nuevaBase: Base) => setBases([...bases, nuevaBase])}
-      />
-      <div className="max-w-7xl mx-auto px-6 ">
+      <SchemaNavbar agregarBase={agregarBase} />
+
+      <div className="max-w-7xl mx-auto px-6">
         <div className="min-h-screen bg-white p-5">
           <div>
             <div className="flex items-center gap-3 mb-6">
@@ -36,11 +51,14 @@ const Index = () => {
                 Acceso Rápido
               </h2>
             </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {bases.map((base, index) => (
+              {bases.map((base) => (
                 <SchemaCard
-                  key={index}
-                  {...base} //operador de propagacion y estas  como heredando todas las props
+                  key={base.id}
+                  {...base}
+                  eliminarBase={eliminarBase}
+                  editarBase={editarBase}
                 />
               ))}
             </div>

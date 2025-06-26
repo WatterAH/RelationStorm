@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import SchemaAlert from "@/components/schemas/SchemaAlert";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -40,17 +40,24 @@ const SchemaDialog = ({ agregarBase }: Props) => {
     color: colors[0],
   });
 
+  const [showAlert, setShowAlert] = useState(false);
+  const [open, setOpen] = useState(false);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.title.trim()) {
+    if (form.title.trim() && form.description.trim()) {
       const newForm = { ...form, id: Date.now().toString() };
       agregarBase(newForm);
       setForm({ id: "", title: "", description: "", color: colors[0] });
+      setShowAlert(false);
+      setOpen(false); // Cierra el modal si todo está bien
+    } else {
+      setShowAlert(true);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="lg">
           <Plus className="h-5 w-5 mr-2" />
@@ -104,12 +111,20 @@ const SchemaDialog = ({ agregarBase }: Props) => {
               ))}
             </div>
           </div>
+
           <div className="flex justify-end mt-6">
-            <DialogClose asChild>
-              <Button type="submit">Crear</Button>
-            </DialogClose>
+            <Button type="submit" className="w-full">
+              Crear
+            </Button>
           </div>
         </form>
+
+        {showAlert && (
+          <SchemaAlert
+            title="Campos incompletos"
+            description="Por favor llena todos los campos antes de continuar."
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
