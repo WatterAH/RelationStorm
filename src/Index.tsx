@@ -2,13 +2,7 @@ import { useEffect, useState } from "react";
 import SchemaCard from "./components/schemas/SchemaCard";
 import SchemaNavbar from "./components/schemas/SchemaNavbar";
 import { Zap } from "lucide-react";
-
-interface Base {
-  id: string;
-  title: string;
-  description: string;
-  color: string;
-}
+import type { Base } from "./interfaces/Schema";
 
 const Index = () => {
   const [bases, setBases] = useState<Base[]>(() => {

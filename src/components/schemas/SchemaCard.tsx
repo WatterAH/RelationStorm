@@ -1,3 +1,4 @@
+import { colors } from "@/constants/Colors";
 import {
   Card,
   CardAction,
@@ -6,15 +7,9 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Database } from "lucide-react";
+import type { Base } from "@/interfaces/Schema";
 
-interface SchemaCardProps {
-  id: string;
-  title: string;
-  description: string;
-  color?: string;
-}
-
-const SchemaCard = ({ id,title, description, color }: SchemaCardProps) => {
+const SchemaCard: React.FC<Base> = ({ id, title, color, description }) => {
   const URL = `/schema/${id}`;
   return (
     <a href={URL}>
@@ -22,7 +17,7 @@ const SchemaCard = ({ id,title, description, color }: SchemaCardProps) => {
         <CardHeader className="text-xl">
           <CardTitle className="text-base">{title}</CardTitle>
           <CardAction
-            className={`w-12 h-12 rounded-xl bg-gradient-to-r ${color} flex items-center justify-center`}
+            className={`w-12 h-12 rounded-xl bg-gradient-to-r ${colors[color]} flex items-center justify-center`}
           >
             <Database className="h-7 w-7 text-white" />
           </CardAction>

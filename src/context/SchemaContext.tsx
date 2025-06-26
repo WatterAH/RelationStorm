@@ -15,6 +15,7 @@ interface TableContextProps {
   removeTable: (id: string) => void;
   addAttribute: (schemaId: string, attribute: Attribute) => void;
   removeAttribute: (schemaId: string, attributeName: string) => void;
+  schemaId: string;
 
   data: TableData;
   setTableData: (tableName: string, rows: Row[]) => void;
@@ -32,30 +33,32 @@ const defaultTableContext: TableContextProps = {
   removeAttribute: () => null,
   setTableData: () => null,
   data: {},
+  schemaId: "",
 };
 
 export const SchemaContext =
   createContext<TableContextProps>(defaultTableContext);
 
 export const SchemaProvider: React.FC<ProviderProps> = ({ children }) => {
-  const { schemaName } = useParams();
+  const params = useParams();
+  const schemaId = params.schemaId || "";
 
   const [tables, setTables] = useState<Table[]>(() => {
-    const saved = localStorage.getItem("tables");
+    const saved = localStorage.getItem(`${schemaId}-tables`);
     return saved ? JSON.parse(saved) : [];
   });
 
   const [data, setData] = useState<TableData>(() => {
-    const saved = localStorage.getItem("data");
+    const saved = localStorage.getItem(`${schemaId}-data`);
     return saved ? JSON.parse(saved) : {};
   });
 
   useEffect(() => {
-    localStorage.setItem("tables", JSON.stringify(tables));
-  }, [tables]);
+    localStorage.setItem(`${schemaId}-tables`, JSON.stringify(tables));
+  }, [tables, schemaId]);
 
   useEffect(() => {
-    localStorage.setItem("data", JSON.stringify(data));
+    localStorage.setItem(`${schemaId}-data`, JSON.stringify(data));
   }, [data]);
 
   function setTableData(tableName: string, rows: Row[]) {
@@ -66,7 +69,7 @@ export const SchemaProvider: React.FC<ProviderProps> = ({ children }) => {
   }
 
   function addTable(tableName: string, callback?: () => void) {
-    if (!tableName.trim() || !schemaName) {
+    if (!tableName.trim() || !schemaId) {
       return toast.error("El nombre del esquema no puede estar vacío!");
     }
 
@@ -76,7 +79,7 @@ export const SchemaProvider: React.FC<ProviderProps> = ({ children }) => {
 
     const newSchema: Table = {
       id: Date.now().toString(),
-      schemaName,
+      schemaId,
       name: tableName,
       attributes: [],
     };
@@ -97,7 +100,7 @@ export const SchemaProvider: React.FC<ProviderProps> = ({ children }) => {
     setTables(tables.filter((t) => t.id !== id));
     setData((prev) => {
       const newData = { ...prev };
-      delete newData[schemaName || ""];
+      delete newData[schemaId || ""];
       return newData;
     });
   }
@@ -135,6 +138,7 @@ export const SchemaProvider: React.FC<ProviderProps> = ({ children }) => {
         removeAttribute,
         setTableData,
         data,
+        schemaId,
       }}
     >
       {children}

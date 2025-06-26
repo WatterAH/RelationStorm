@@ -11,7 +11,7 @@ createRoot(document.getElementById("root")!).render(
     <Providers>
       <BrowserRouter>
         <Routes>
-          <Route path="/schema/:id" element={<App />} />
+          <Route path="/schema/:schemaId" element={<App />} />
           <Route path="/" element={<Index />} />
         </Routes>
       </BrowserRouter>
