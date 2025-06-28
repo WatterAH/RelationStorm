@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import SchemaCard from "./components/schemas/SchemaCard";
 import SchemaNavbar from "./components/schemas/SchemaNavbar";
-import { Zap } from "lucide-react";
+import { Target } from "lucide-react";
 import type { Base } from "./interfaces/Schema";
 
 const Index = () => {
@@ -32,17 +32,17 @@ const Index = () => {
 
   return (
     <>
-      <SchemaNavbar agregarBase={agregarBase} />
+      <SchemaNavbar bases={bases} agregarBase={agregarBase} />
 
       <div className="max-w-7xl mx-auto px-6">
         <div className="min-h-screen bg-white p-5">
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                <Zap className="h-4 w-4 text-white" />
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
+                <Target className="h-4 w-4 text-white" />
               </div>
               <h2 className="text-xl font-semibold text-gray-900">
-                Acceso Rápido
+                Todas las Bases 
               </h2>
             </div>
 

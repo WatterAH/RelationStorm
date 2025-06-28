@@ -8,9 +8,9 @@ interface SchemaAlertProps {
 
 const SchemaAlert = ({ title = "Error", description }: SchemaAlertProps) => {
   return (
-    <Alert variant="destructive" className="mt-4">
-      <AlertCircleIcon className="h-5 w-5" />
-      <div className="flex flex-col">
+    <Alert variant="destructive" className="mt-4 flex items-start gap-3">
+      <AlertCircleIcon className="h-5 w-5 mt-1" />
+      <div>
         <AlertTitle>{title}</AlertTitle>
         <AlertDescription>{description}</AlertDescription>
       </div>

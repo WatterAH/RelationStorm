@@ -36,7 +36,7 @@ const SchemaDialog = ({ agregarBase }: Props) => {
       agregarBase(newForm);
       setForm({ id: "", title: "", description: "", color: 0 });
       setShowAlert(false);
-      setOpen(false); // Cierra el modal si todo está bien
+      setOpen(false);
     } else {
       setShowAlert(true);
     }
@@ -53,9 +53,7 @@ const SchemaDialog = ({ agregarBase }: Props) => {
 
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl">
-            Crear Nueva Base de Datos
-          </DialogTitle>
+          <DialogTitle className="text-xl">Crear Nueva Base de Datos</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -64,7 +62,7 @@ const SchemaDialog = ({ agregarBase }: Props) => {
             <Input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder="ej. E-Commerce, Blog, CRM..."
+              placeholder="Ej. E-Commerce, Blog, CRM..."
               required
             />
           </div>
@@ -73,9 +71,7 @@ const SchemaDialog = ({ agregarBase }: Props) => {
             <Label className="text-base">Descripción</Label>
             <Input
               value={form.description}
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
               placeholder="Describe el propósito de la base de datos"
             />
           </div>
@@ -89,9 +85,7 @@ const SchemaDialog = ({ agregarBase }: Props) => {
                   type="button"
                   onClick={() => setForm({ ...form, color: idx })}
                   className={`h-12 rounded-xl bg-gradient-to-r ${color} transition-all hover:scale-105 ${
-                    form.color === idx
-                      ? "ring-4 ring-offset-2 ring-gray-300"
-                      : ""
+                    form.color === idx ? "ring-4 ring-offset-2 ring-gray-300" : ""
                   }`}
                 />
               ))}
