@@ -1,4 +1,4 @@
-import type { Row } from "@/interfaces/Schema";
+import type { Row } from "@/interfaces/Table";
 
 class SQLClass {
   UNION(tableA: Row[], tableB: Row[]): Row[] {

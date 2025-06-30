@@ -1,16 +1,16 @@
 import SQL from "./sql";
-import { splitBinary } from "./utils";
-import type { Row, Schema } from "@/interfaces/Schema";
+import { canSubtract, canUnion, splitBinary } from "./utils";
+import type { Row, Table } from "@/interfaces/Table";
 import type { Predicate, RelationalQuery } from "@/interfaces/Query";
 
 export function parseExpression(
   input: string,
-  schemas: Schema[]
+  tables: Table[]
 ): RelationalQuery {
   input = input.trim();
 
   if (!input.includes("(")) {
-    const table = schemas.find((s) => s.name === input);
+    const table = tables.find((s) => s.name === input);
     if (!table) throw new Error(`Table ${input} does not exist`);
     return { type: "table", tableName: input };
   }
@@ -23,7 +23,7 @@ export function parseExpression(
     return {
       type: "projection",
       attributes: attrs,
-      input: parseExpression(subExpr, schemas),
+      input: parseExpression(subExpr, tables),
     };
   }
 
@@ -36,7 +36,7 @@ export function parseExpression(
 
     return {
       type: "selection",
-      input: parseExpression(subExpr, schemas),
+      input: parseExpression(subExpr, tables),
       predicate,
     };
   }
@@ -50,8 +50,8 @@ export function parseExpression(
 
     return {
       type: "join",
-      left: parseExpression(left, schemas),
-      right: parseExpression(right, schemas),
+      left: parseExpression(left, tables),
+      right: parseExpression(right, tables),
       condition: condition ? parsePredicate(condition) : undefined,
     };
   }
@@ -61,8 +61,8 @@ export function parseExpression(
 
     return {
       type: "difference",
-      left: parseExpression(leftRaw, schemas),
-      right: parseExpression(rightRaw, schemas),
+      left: parseExpression(leftRaw, tables),
+      right: parseExpression(rightRaw, tables),
     };
   }
 
@@ -71,8 +71,8 @@ export function parseExpression(
 
     return {
       type: "product",
-      left: parseExpression(leftRaw, schemas),
-      right: parseExpression(rightRaw, schemas),
+      left: parseExpression(leftRaw, tables),
+      right: parseExpression(rightRaw, tables),
     };
   }
 
@@ -81,8 +81,8 @@ export function parseExpression(
 
     return {
       type: "union",
-      left: parseExpression(leftRaw, schemas),
-      right: parseExpression(rightRaw, schemas),
+      left: parseExpression(leftRaw, tables),
+      right: parseExpression(rightRaw, tables),
     };
   }
 
@@ -91,8 +91,8 @@ export function parseExpression(
 
     return {
       type: "intersect",
-      left: parseExpression(leftRaw, schemas),
-      right: parseExpression(rightRaw, schemas),
+      left: parseExpression(leftRaw, tables),
+      right: parseExpression(rightRaw, tables),
     };
   }
 
@@ -137,7 +137,7 @@ export function parsePredicate(condition: string): Predicate {
 export function evaluate(
   query: RelationalQuery,
   tables: Record<string, any[]>,
-  schemas: Schema[]
+  schemas: Table[]
 ): { rows: Row[]; schemaName?: string } {
   switch (query.type) {
     case "table":
@@ -175,9 +175,14 @@ export function evaluate(
 
     case "projection": {
       const result = evaluate(query.input, tables, schemas);
+
       const projectedRows = result.rows.map((row) => {
         const projected: Row = {};
+
         for (const attr of query.attributes) {
+          if (!row[attr]) {
+            throw new Error("El registro contiene atributos no válidos");
+          }
           projected[attr] = row[attr];
         }
         return projected;
@@ -193,6 +198,12 @@ export function evaluate(
       const left = evaluate(query.left, tables, schemas);
       const right = evaluate(query.right, tables, schemas);
 
+      if (!canUnion(left.rows, right.rows)) {
+        throw new Error(
+          "Estructura incompatible: claves diferentes o en orden distinto."
+        );
+      }
+
       return {
         rows: SQL.UNION(left.rows, right.rows),
         schemaName: left.schemaName ?? right.schemaName,
@@ -203,6 +214,12 @@ export function evaluate(
       const left = evaluate(query.left, tables, schemas);
       const right = evaluate(query.right, tables, schemas);
 
+      if (!canUnion(left.rows, right.rows)) {
+        throw new Error(
+          "Estructura incompatible: claves diferentes o en orden distinto."
+        );
+      }
+
       return {
         rows: SQL.INTERSECT(left.rows, right.rows),
         schemaName: left.schemaName ?? right.schemaName,
@@ -212,6 +229,12 @@ export function evaluate(
     case "difference": {
       const left = evaluate(query.left, tables, schemas);
       const right = evaluate(query.right, tables, schemas);
+
+      if (!canSubtract(left.rows, right.rows)) {
+        throw new Error(
+          "No se puede restar: las tablas tienen distinta estructura"
+        );
+      }
 
       return {
         rows: SQL.DIFFERENCE(left.rows, right.rows),

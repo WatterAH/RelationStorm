@@ -6,14 +6,14 @@ import { useState } from "react";
 import { operators } from "@/constants/Operators";
 import { useSchemas } from "@/context/SchemaContext";
 import { evaluate, parseExpression } from "@/lib/query";
-import type { Row } from "@/interfaces/Schema";
+import type { Row } from "@/interfaces/Table";
 
 interface Props {
   setResult: (value: Row[]) => void;
 }
 
 export const QueryInput: React.FC<Props> = ({ setResult }) => {
-  const { data, schemas } = useSchemas();
+  const { data, tables } = useSchemas();
   const [expression, setExpression] = useState("");
 
   const insertAtCursor = (text: string) => {
@@ -38,8 +38,8 @@ export const QueryInput: React.FC<Props> = ({ setResult }) => {
 
   const execute = () => {
     try {
-      const query = parseExpression(expression, schemas);
-      const { rows } = evaluate(query, data, schemas);
+      const query = parseExpression(expression, tables);
+      const { rows } = evaluate(query, data, tables);
 
       setResult(rows);
     } catch (error: any) {
